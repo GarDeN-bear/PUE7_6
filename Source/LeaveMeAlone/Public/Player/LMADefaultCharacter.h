@@ -87,7 +87,7 @@ private:
 
 	bool isShift = false;
 	bool isStartCooldown = false;
-	bool isSprintReady = true;
+	bool isStaminaFull = true;
 	bool isSprintActive = false;
 
 	void MoveForward(float Value);
@@ -104,4 +104,5 @@ private:
 
 	void WalkOrSprint();
 	void CheckSprintActivity(const float& Value);
+	void OnStaminaChanged();
 };

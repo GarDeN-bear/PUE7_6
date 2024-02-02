@@ -44,6 +44,7 @@ void ALMADefaultCharacter::BeginPlay()
 	}
 
 	OnHealthChanged(HealthComponent->GetHealth());
+	OnStaminaChanged();
 	HealthComponent->OnDeath.AddUObject(this, &ALMADefaultCharacter::OnDeath);
 	HealthComponent->OnHealthChanged.AddUObject(this, &ALMADefaultCharacter::OnHealthChanged);
 }
@@ -146,6 +147,7 @@ void ALMADefaultCharacter::WalkOrSprint() {
 		isStartCooldown = true;
 	}
 
+
 	if (isStartCooldown)
 	{
 		Stamina = FMath::Clamp(Stamina + StaminaCost, StaminaMin, StaminaCooldown);
@@ -154,9 +156,14 @@ void ALMADefaultCharacter::WalkOrSprint() {
 			isStartCooldown = false;
 		}
 	}
-	else if ((!isSprintReady && !isShift) || (!isSprintActive && isShift))
+	else if (!isStaminaFull && !isSprintActive)
 	{
 		Stamina = FMath::Clamp(Stamina + StaminaCost, StaminaMin, StaminaMax);
+		if (Stamina == StaminaMax)
+		{
+			isStaminaFull = true;
+		}
+		OnStaminaChanged();
 	}
 }
 
@@ -167,7 +174,13 @@ void ALMADefaultCharacter::CheckSprintActivity(const float &Value)
 	{
 		isSprintActive = true;
 		Stamina = FMath::Clamp(Stamina - StaminaCost, StaminaMin, StaminaMax);
+		OnStaminaChanged(); 
 		GetCharacterMovement()->MaxWalkSpeed = SprintVelocity;
-		isSprintReady = false;
+		isStaminaFull = false;
 	}
+}
+
+void ALMADefaultCharacter::OnStaminaChanged() 
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Stamina = %f"), Stamina));
 }
